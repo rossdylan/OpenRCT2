@@ -5098,7 +5098,6 @@ static TileElement* loc_6B4F6B(ride_id_t rideIndex, int32_t x, int32_t y)
 
 int32_t ride_is_valid_for_test(Ride* ride, int32_t status, bool isApplying)
 {
-    int32_t stationIndex;
     CoordsXYE trackElement, problematicTrackElement = {};
 
     if (ride->type == RIDE_TYPE_NULL)
@@ -5112,8 +5111,8 @@ int32_t ride_is_valid_for_test(Ride* ride, int32_t status, bool isApplying)
         window_close_by_number(WC_RIDE_CONSTRUCTION, ride->id);
     }
 
-    stationIndex = ride_mode_check_station_present(ride);
-    if (stationIndex == -1)
+    auto stationIndex = ride_mode_check_station_present(ride);
+    if (stationIndex == STATION_INDEX_NULL)
         return 0;
 
     if (!ride_mode_check_valid_station_numbers(ride))
@@ -5238,7 +5237,6 @@ int32_t ride_is_valid_for_test(Ride* ride, int32_t status, bool isApplying)
  */
 int32_t ride_is_valid_for_open(Ride* ride, int32_t goingToBeOpen, bool isApplying)
 {
-    int32_t stationIndex;
     CoordsXYE trackElement, problematicTrackElement = {};
 
     // Check to see if construction tool is in use. If it is close the construction window
@@ -5249,8 +5247,8 @@ int32_t ride_is_valid_for_open(Ride* ride, int32_t goingToBeOpen, bool isApplyin
         && (input_test_flag(INPUT_FLAG_TOOL_ACTIVE)))
         window_close_by_number(WC_RIDE_CONSTRUCTION, ride->id);
 
-    stationIndex = ride_mode_check_station_present(ride);
-    if (stationIndex == -1)
+    auto stationIndex = ride_mode_check_station_present(ride);
+    if (stationIndex == STATION_INDEX_NULL)
         return 0;
 
     if (!ride_mode_check_valid_station_numbers(ride))
