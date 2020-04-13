@@ -13,6 +13,13 @@
 
 #include <memory>
 
+#include <prometheus/gauge.h>
+#include <prometheus/family.h>
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
+
+using namespace prometheus;
+
 namespace OpenRCT2
 {
     class Park;
@@ -24,6 +31,9 @@ namespace OpenRCT2
     {
     private:
         std::unique_ptr<Park> _park;
+        std::unique_ptr<Exposer> _exposer;
+        std::shared_ptr<Registry> _registry;
+        Family<Gauge>& _ride_value_family;
         Date _date;
 
     public:

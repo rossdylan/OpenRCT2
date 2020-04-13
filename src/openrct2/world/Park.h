@@ -13,10 +13,15 @@
 #include "../ride/Ride.h"
 #include "Map.h"
 
+#include <prometheus/gauge.h>
+#include <prometheus/family.h>
+
 #define DECRYPT_MONEY(money) ((money32)rol32((money) ^ 0xF4EC9621, 13))
 #define ENCRYPT_MONEY(money) ((money32)(ror32((money), 13) ^ 0xF4EC9621))
 
 #define MAX_ENTRANCE_FEE MONEY(200, 00)
+
+using namespace prometheus;
 
 struct Peep;
 
@@ -72,6 +77,7 @@ namespace OpenRCT2
         money32 CalculateParkValue() const;
         money32 CalculateCompanyValue() const;
         static uint8_t CalculateGuestInitialHappiness(uint8_t percentage);
+        void UpdateParkCounters(Family<Gauge>& ride_value_family);
 
         Peep* GenerateGuest();
 

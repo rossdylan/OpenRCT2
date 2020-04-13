@@ -51,6 +51,37 @@ option(DISABLE_TTF "Disable support for TTF provided by freetype2.")
 option(ENABLE_LIGHTFX "Enable lighting effects." ON)
 
 option(DISABLE_GUI "Don't build GUI. (Headless only.)")
+option(ENABLE_PROMETHEUS "Enable stats export via prometheus" OFF)
+
+if (ENABLE_PROMETHEUS)
+    if(NOT TARGET prometheus-cpp::core)
+      message(STATUS "Dependency: prometheus-cpp")
+
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/prometheus-cpp.CMakeLists.txt
+                     ${CMAKE_BINARY_DIR}/prometheus-download/CMakeLists.txt)
+      execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                      RESULT_VARIABLE result
+                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/prometheus-download)
+      if(result)
+        message(FATAL_ERROR "CMake step failed: ${result}")
+      endif()
+      execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                      RESULT_VARIABLE result
+                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/prometheus-download)
+      if(result)
+        message(FATAL_ERROR "Build step failed: ${result}")
+      endif()
+
+      set(ENABLE_PUSH OFF CACHE BOOL "Build prometheus-cpp push library" FORCE)
+      set(ENABLE_PULL ON CACHE BOOL "Build prometheus-cpp pull library" FORCE)
+      set(ENABLE_COMPRESSION OFF
+          CACHE BOOL "Enable gzip compression for prometheus-cpp"
+          FORCE)
+      set(ENABLE_TESTING OFF CACHE BOOL "Build test for prometheus-cpp" FORCE)
+      add_subdirectory(${CMAKE_BINARY_DIR}/prometheus-src
+                       ${CMAKE_BINARY_DIR}/prometheus-build EXCLUDE_FROM_ALL)
+    endif()
+endif()
 
 if (FORCE32)
     set(TARGET_M "-m32")

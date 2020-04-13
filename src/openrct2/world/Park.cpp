@@ -40,6 +40,9 @@
 #include "Sprite.h"
 #include "Surface.h"
 
+#include <prometheus/gauge.h>
+#include <prometheus/family.h>
+
 #include <algorithm>
 #include <limits>
 
@@ -548,6 +551,14 @@ money16 Park::CalculateTotalRideValueForMoney() const
         }
     }
     return totalRideValue;
+}
+
+void Park::UpdateParkCounters(Family<Gauge>& ride_value_family) {
+    for (const auto& ride : GetRideManager()) {
+        money32 rv = CalculateRideValue(&ride);
+        auto& ride_value = ride_value_family.Add({{"ride", ride.GetName()}});
+        ride_value.Set(rv);
+    }
 }
 
 uint32_t Park::CalculateSuggestedMaxGuests() const

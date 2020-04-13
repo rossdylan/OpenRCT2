@@ -35,13 +35,18 @@
 #include "world/Park.h"
 #include "world/Scenery.h"
 
+#include <prometheus/counter.h>
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
+
 #include <algorithm>
 
 using namespace OpenRCT2;
 
-GameState::GameState()
+GameState::GameState() : _exposer(std::make_unique<Exposer>("127.0.0.1:8080", "/metrics", 1)), _registry(std::make_shared<Registry>()), _ride_value_family(BuildGauge().Name("ride_value").Register(*this->_registry))
 {
     _park = std::make_unique<Park>();
+    _exposer->RegisterCollectable(_registry);
 }
 
 /**
@@ -218,6 +223,8 @@ void GameState::Update()
     {
         pause_toggle();
     }
+
+    this->GetPark().UpdateParkCounters(this->_ride_value_family);
 
     gDoSingleUpdate = false;
     gInUpdateCode = false;

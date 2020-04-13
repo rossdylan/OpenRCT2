@@ -22,6 +22,10 @@ add_library(${PROJECT_NAME} ${OPENRCT2_CORE_SOURCES} ${OPENRCT2_CORE_MM_SOURCES}
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 SET_CHECK_CXX_FLAGS(${PROJECT_NAME})
 
+if (ENABLE_PROMETHEUS)
+    target_link_libraries(${PROJECT_NAME} prometheus-cpp::pull)
+endif ()
+
 # GCC / Clang likes us to pass the -lstdc++fs flag to link C++17 filesystem implementation.
 if (NOT MINGW AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
